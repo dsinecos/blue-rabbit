@@ -23,6 +23,7 @@
   "dependencies": {
     "amqplib": "^0.5.2",
     "debug": "^3.1.0",
+    "delegates": "^1.0.0",
     "koa-compose": "^4.1.0"
   }
 }
