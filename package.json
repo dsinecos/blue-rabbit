@@ -19,5 +19,9 @@
   "devDependencies": {
     "eslint": "^4.19.1",
     "eslint-config-rallycoding": "^3.2.0"
+  },
+  "dependencies": {
+    "amqplib": "^0.5.2",
+    "debug": "^3.1.0"
   }
 }
