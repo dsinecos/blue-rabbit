@@ -25,30 +25,44 @@ consumer.on('setup:error', function (err) {
     console.log(err);
 })
 
-function middleware1(context, next) {
+consumer.on('consumer:error', function(err, context) {
+    console.log("Error in consumer caught in event handler");
+    console.log("Error ", err);
+    console.log("Message that resulted in error ", context.message.content.toString());
+})
+
+async function middleware1(context, next) {
     // console.log(context.message.content);
     console.log("Downstream middleware 1");
-    next();
+    await next();
     console.log("Upstream middleware 1");
-    context.ack(context.message);
+    // context.ack(context.message);
 }
 
 consumer.use(middleware1);
 
-function middleware2(context, next) {
+async function middleware2(context, next) {
     // console.log(context.message.content);
     console.log("Downstream middleware 2");
-    next()
+    await next()
     console.log("Upstream middleware 2");
 }
 
 consumer.use(middleware2);
 
-function middleware3(context, next) {
+async function middleware3(context, next) {
     console.log("Downstream middleware 3");
     context.printContents();
-    next();
+    await next();
     console.log("Upstream middleware 3");
 }
 
 consumer.use(middleware3);
+
+async function generateError(context, next) {
+    console.log("Generating error");
+    throw new Error("Error in one of the middleware function");
+    await next();
+}
+
+consumer.use(generateError);
