@@ -42,7 +42,26 @@ async function printMessage(context, next) {
     await next();
 }
 
-consumer.use(printMessage);
+// consumer.use(printMessage);
+
+async function publishMessage(context, next) {
+    console.log("Publishing message");
+    const channelKey = "MessagePublishQueue";
+    const queue = 'publishQueue';
+    const queueOptions = {
+        durable: true
+    }
+    const content = "Test publishing message";
+    const messageOptions = {
+        persistent: true
+    }
+
+    await context.sendToQueue(channelKey, queue, queueOptions, content, messageOptions);
+    console.log("Message published");
+    await next();
+}
+
+consumer.use(publishMessage);
 
 async function middleware1(context, next) {
     // console.log(context.message.content);
