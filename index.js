@@ -44,7 +44,7 @@ async function printMessage(context, next) {
 
 // consumer.use(printMessage);
 
-async function publishMessage(context, next) {
+async function sendMessage(context, next) {
     console.log("Publishing message");
     const channelKey = "MessagePublishQueue";
     const queue = 'publishQueue';
@@ -57,6 +57,27 @@ async function publishMessage(context, next) {
     }
 
     await context.sendToQueue(channelKey, queue, queueOptions, content, messageOptions);
+    console.log("Message published");
+    await next();
+}
+
+// consumer.use(sendMessage);
+
+async function publishMessage(context, next) {
+    console.log("Publishing message");
+    const channelKey = "MessagePublish";
+    const exchange = "test";
+    const exchangeType = "direct";
+    const exchangeOptions = {
+        durable: true
+    }
+    const routingKey = 'testQueue';
+    const content = "Test publishing message";
+    const messageOptions = {
+        persistent: true
+    }
+
+    await context.publish(channelKey, exchange, exchangeType, exchangeOptions, routingKey, content, messageOptions);
     console.log("Message published");
     await next();
 }
