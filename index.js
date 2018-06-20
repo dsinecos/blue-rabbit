@@ -1,14 +1,18 @@
 const Consumer = require('./lib/application');
 
 const connectionUrl = 'amqp://localhost';
-const consumeQueue = 'hello';
-const consumeQueueOptions = {
+const queue = 'hello';
+const queueOptions = {
+    durable: false
+};
+const consumeOptions = {
     noAck: false
-}
+};
+const socketOptions = {};
 
-const consumer = new Consumer(connectionUrl, consumeQueue, consumeQueueOptions);
+const consumer = new Consumer(queue, queueOptions, consumeOptions);
 
-consumer.connect();
+consumer.connect(connectionUrl, socketOptions);
 
 consumer.on('connection:error', function (err) {
     console.log("Connection error caught in event handler");
@@ -25,11 +29,20 @@ consumer.on('setup:error', function (err) {
     console.log(err);
 })
 
-consumer.on('consumer:error', function(err, context) {
+consumer.on('consumer:error', function (err, context) {
     console.log("Error in consumer caught in event handler");
     console.log("Error ", err);
     console.log("Message that resulted in error ", context.message.content.toString());
 })
+
+async function printMessage(context, next) {
+    console.log("This is the message");
+    console.log(context.message);
+    console.log("Message content ", context.message.content.toString());
+    await next();
+}
+
+consumer.use(printMessage);
 
 async function middleware1(context, next) {
     // console.log(context.message.content);
@@ -39,7 +52,7 @@ async function middleware1(context, next) {
     // context.ack(context.message);
 }
 
-consumer.use(middleware1);
+// consumer.use(middleware1);
 
 async function middleware2(context, next) {
     // console.log(context.message.content);
@@ -48,7 +61,7 @@ async function middleware2(context, next) {
     console.log("Upstream middleware 2");
 }
 
-consumer.use(middleware2);
+// consumer.use(middleware2);
 
 async function middleware3(context, next) {
     console.log("Downstream middleware 3");
@@ -57,7 +70,7 @@ async function middleware3(context, next) {
     console.log("Upstream middleware 3");
 }
 
-consumer.use(middleware3);
+// consumer.use(middleware3);
 
 async function generateError(context, next) {
     console.log("Generating error");
@@ -65,4 +78,4 @@ async function generateError(context, next) {
     await next();
 }
 
-consumer.use(generateError);
+// consumer.use(generateError);
