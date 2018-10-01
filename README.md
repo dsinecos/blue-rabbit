@@ -2,6 +2,8 @@
 
 A microservice framework based on the middleware pattern (as used in [Koa](https://github.com/koajs/koa))
 
+**Note** - It's work in progress
+
 ## Usage and Examples
 
 ```javascript
